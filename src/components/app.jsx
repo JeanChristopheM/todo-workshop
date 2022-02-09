@@ -1,60 +1,43 @@
-import React, {useState} from "react";
-import ListItem from "./list-item";
-import Header from "./header";
+import React, {useState, useEffect} from "react";
 
 function App() {
-    const [todos, setTodos] = useState([]);
-    const [value, setValue] = useState(null);
+    const [count, setCount] = useState(0);
+    const [intervalID, setIntervalID] = useState(0);
+    const [go, setGo] = useState("start");
 
-    const submitTodo = () => {
-        const newTodo = {
-            status: false,
-            task: value,
-            id: new Date().getTime(),
-        };
-        setTodos([...todos, newTodo]);
+    const startTimer = () => {
+        setIntervalID(
+            setInterval(() => {
+                setCount((currentCount) => currentCount + 1);
+            }, 100),
+        );
     };
-    const changeStatus = (searchingKey) => {
-        const todosToModify = [...todos];
-        for (let todo of todosToModify) {
-            if (searchingKey === todo.id) {
-                todo.status = !todo.status;
-            }
-        }
-        setTodos(todosToModify);
+    const stopTimer = () => {
+        clearInterval(intervalID);
     };
-    const deleteTodo = (searchingKey) => {
-        const todosToModify = todos.filter((todo) => todo.id !== searchingKey);
-        setTodos(todosToModify);
-    };
+    useEffect(() => {
+        if (go === true) startTimer();
+        if (!go) stopTimer();
+    }, [go]);
     return (
         <>
-            <Header title={"List de todo"} />
-            <main className={"main"}>
-                <div className={"input"}>
-                    <input
-                        type={"text"}
-                        onChange={(e) => {
-                            setValue(e.target.value);
-                        }}
-                    />
-                    <button type={"button"} onClick={submitTodo}>
-                        {"submit"}
-                    </button>
-                </div>
-                <div className={"todoContainer"}>
-                    <ul>
-                        {todos.map((todo) => (
-                            <ListItem
-                                key={todo.id}
-                                todo={todo}
-                                handleStatus={changeStatus}
-                                handleDelete={deleteTodo}
-                            />
-                        ))}
-                    </ul>
-                </div>
-            </main>
+            <div>{count}</div>
+            <div>
+                <button
+                    type={"button"}
+                    onClick={() => {
+                        setGo(true);
+                    }}>
+                    {"GO"}
+                </button>
+                <button
+                    type={"button"}
+                    onClick={() => {
+                        setGo(false);
+                    }}>
+                    {"STOP"}
+                </button>
+            </div>
         </>
     );
 }
